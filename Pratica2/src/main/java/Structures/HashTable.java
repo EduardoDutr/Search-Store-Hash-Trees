@@ -6,8 +6,11 @@ package Structures;
 //not anymore :)
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HashTable<K, V> {
-    private int size = 10;
+    private int size = 5;
     private int quantity =0;
     private Double LOADFACTOR;
     private Entry<K, V>[] table;
@@ -26,20 +29,20 @@ public class HashTable<K, V> {
             quantity++;
             reallocateIfLoadFactor();
         } else {
-            collisionPutByLinkedList(table[index],entry);
-            //quadraticPut(entry,index);
+            //collisionPutByLinkedList(table[index],entry);
+            quadraticPut(entry,index);
         }
     }
 
     public V get(K key) {
         int index = getIndex(key);
 
-        Entry<K, V> entry = collisionGetByLinkedList(key,table[index]);
-        if(entry!=null) return entry.getValue();
-        return null;
+//        Entry<K, V> entry = collisionGetByLinkedList(key,table[index]);
+//        if(entry!=null) return entry.getValue();
+//        return null;
 
         //existe a chance de ser null ! tratar.
-        //return quadraticGet(key, index);
+        return quadraticGet(key, index);
     }
 
     public void remove(K key) {
@@ -105,30 +108,44 @@ public class HashTable<K, V> {
         }
     }
 
+    private void reallocateIfLoadFactor() {
+        if ((double) quantity / size >= LOADFACTOR) {
+            size = size * 2;
+            Entry<K, V>[] newTable = new Entry[size];
 
-//erro, adaptar para os metodos quadratico e linked list
-    private void reallocateIfLoadFactor(){
-        if((double)quantity/size >= LOADFACTOR){
-            size = size*2;
-            Entry<K,V>[] newTable = new Entry[size];
-            Entry aux;
-            for(int i =0;i<size/2;i++){
-                if(table[i] !=null){
-                    if(newTable[getIndex(table[i].getKey())] != null){
-                      aux = newTable[getIndex(table[i].getKey())];
-                      while(aux.getNextEntry()!= null){
-                          aux = aux.getNextEntry();
-                      }
-                      aux.setNextEntry(table[i]);
-                    }
-                    else{
-                        newTable[getIndex(table[i].getKey())] = table[i];
-                    }
-                }
+            for (Entry<K, V> entry : table) {
+                reallocate(newTable, entry);
             }
+
             table = newTable;
         }
     }
+
+    private void reallocate(Entry<K, V>[] newTable, Entry<K, V> entry) {
+        if (entry != null) {
+            Entry<K, V> aux;
+            if (entry.getNextEntry() != null) {
+                reallocate(newTable, entry.getNextEntry());
+            }
+
+            int newIndex = getIndex(entry.key);
+
+            if (newTable[newIndex] != null) {
+                aux = newTable[newIndex];
+                while (aux.getNextEntry() != null) {
+                    aux = aux.getNextEntry();
+                }
+                aux.setNextEntry(entry);
+                entry.setNextEntry(null);
+            } else {
+                newTable[newIndex] = entry;
+                entry.setNextEntry(null);
+            }
+
+            quantity++;
+        }
+    }
+
 
 
     private int quadraticProbing(int index, int attempt){
@@ -167,10 +184,6 @@ public class HashTable<K, V> {
             collisionPutByLinkedList(entryAux.getNextEntry(),entry);
         }
         entryAux.setNextEntry(entry);
-//        while(!pos.getNextEntry().equals(null)){
-//            pos = pos.getNextEntry();
-//        }
-//        pos.setNextEntry(entry);
     }
     private Entry<K,V> collisionGetByLinkedList(K key,Entry pos){
         Entry entry = pos;
@@ -179,11 +192,19 @@ public class HashTable<K, V> {
             return collisionGetByLinkedList(key,entry.getNextEntry());
         }
         return null;
-        //if(entry.getNextEntry())
-//        while(entry != null){
-//            if(entry.getKey().equals(key)) break;
-//            entry = pos.getNextEntry();
-//        }
-//        return entry;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
