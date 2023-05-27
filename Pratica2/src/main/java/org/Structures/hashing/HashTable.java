@@ -1,4 +1,4 @@
-package org.Structures;
+package org.Structures.hashing;
 
 
 //

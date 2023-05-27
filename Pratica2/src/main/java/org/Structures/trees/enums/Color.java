@@ -1,4 +1,4 @@
-package org.Structures.enums;
+package org.Structures.trees.enums;
 
 public enum Color {
     BLACK,
