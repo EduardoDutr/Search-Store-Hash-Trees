@@ -1,15 +1,15 @@
-package Structures;
+package org.Structures;
 
 
 //
 //ChatGPT version
 //not anymore :)
 
-
+@SuppressWarnings("unchecked")
 public class HashTable<K, V> {
     private int size = 10;
-    private int quantity =0;
-    private Double LOADFACTOR;
+    private int quantity = 0;
+    private final Double LOADFACTOR;
     private Entry<K, V>[] table;
 
     public HashTable(Double LOADFACTOR) {
@@ -35,7 +35,7 @@ public class HashTable<K, V> {
         int index = getIndex(key);
 
         Entry<K, V> entry = collisionGetByLinkedList(key,table[index]);
-        if(entry!=null) return entry.getValue();
+        if(entry!=null) return entry.value;
         return null;
 
         //existe a chance de ser null ! tratar.
@@ -46,7 +46,7 @@ public class HashTable<K, V> {
         int index = getIndex(key);
         Entry<K, V> entry = table[index];
 
-        if (entry != null && entry.getKey().equals(key)) {
+        if (entry != null && entry.key.equals(key)) {
             table[index] = null;
             quantity--;
         }
@@ -54,7 +54,7 @@ public class HashTable<K, V> {
         int newIndex = (index + 1) % size;
         while (newIndex != index) {
             entry = table[newIndex];
-            if (entry != null && entry.getKey().equals(key)) {
+            if (entry != null && entry.key.equals(key)) {
                table[newIndex] = null;
                return;
             }
@@ -78,22 +78,14 @@ public class HashTable<K, V> {
     }
 
     private static class Entry<K, V> {
-        private K key;
-        private V value;
+        private final K key;
+        private final V value;
         private Entry<K,V> nextEntry;
 
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
             nextEntry = null;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
         }
 
         public Entry<K, V> getNextEntry() {
@@ -109,32 +101,47 @@ public class HashTable<K, V> {
 //erro, adaptar para os metodos quadratico e linked list
     private void reallocateIfLoadFactor(){
         if((double)quantity/size >= LOADFACTOR){
-            size = size*2;
-            Entry<K,V>[] newTable = new Entry[size];
-            Entry aux;
-            for(int i =0;i<size/2;i++){
-                if(table[i] !=null){
-                    if(newTable[getIndex(table[i].getKey())] != null){
-                      aux = newTable[getIndex(table[i].getKey())];
-                      while(aux.getNextEntry()!= null){
-                          aux = aux.getNextEntry();
-                      }
-                      aux.setNextEntry(table[i]);
-                    }
-                    else{
-                        newTable[getIndex(table[i].getKey())] = table[i];
-                    }
+            size *= 2;
+
+            Entry<K, V>[] newTable = new Entry[size];
+
+            for(int i = 0; i < size/2; i++){
+                if(table[i] != null){
+                    reallocate(table[i], newTable);
                 }
             }
             table = newTable;
         }
     }
 
+    private void reallocate(Entry<K,V> element, Entry<K, V>[] newTable){
+        Entry<K, V> aux;
+
+        if(newTable[getIndex(element.key)] != null){
+            aux = newTable[getIndex(element.key)];
+            while(aux.getNextEntry() != null){
+                aux = aux.getNextEntry();
+            }
+            aux.setNextEntry(element);
+        }
+        else{
+            newTable[getIndex(element.key)] = element;
+        }
+
+        if (element.nextEntry != null) {
+            aux = element.nextEntry;
+            element.nextEntry = null;
+            reallocate(aux, newTable);
+        }
+
+        quantity++;
+    }
+
 
     private int quadraticProbing(int index, int attempt){
         return (index + attempt *attempt)%size;
     }
-    private void quadraticPut(Entry entry,int index){
+    private void quadraticPut(Entry<K, V> entry,int index){
         int count =0;
         do{
             count++;
@@ -151,8 +158,8 @@ public class HashTable<K, V> {
     private V quadraticGet(K key, int index){
         int count = 0;
         while (table[index] != null && count < size) {
-            if (table[index].getKey().equals(key)) {
-                return table[index].getValue();
+            if (table[index].key.equals(key)) {
+                return table[index].value;
             }
             count++;
             index = quadraticProbing(index, count);
@@ -161,22 +168,21 @@ public class HashTable<K, V> {
     }
 
     //trata caso de repeticao de chaves
-    private void collisionPutByLinkedList(Entry pos, Entry entry){
-        Entry entryAux = pos;
-        if(entryAux.getNextEntry()!= null){
-            collisionPutByLinkedList(entryAux.getNextEntry(),entry);
+    private void collisionPutByLinkedList(Entry<K, V> pos, Entry<K, V> entry){
+        if(pos.getNextEntry()!= null){
+            collisionPutByLinkedList(pos.getNextEntry(),entry);
         }
-        entryAux.setNextEntry(entry);
+        pos.setNextEntry(entry);
 //        while(!pos.getNextEntry().equals(null)){
 //            pos = pos.getNextEntry();
 //        }
 //        pos.setNextEntry(entry);
     }
-    private Entry<K,V> collisionGetByLinkedList(K key,Entry pos){
-        Entry entry = pos;
-        if(entry.getKey().equals(key)) return entry;
-        if(entry.getNextEntry() != null){
-            return collisionGetByLinkedList(key,entry.getNextEntry());
+    private Entry<K,V> collisionGetByLinkedList(K key,Entry<K, V> pos){
+        if(pos.key.equals(key))
+            return pos;
+        if(pos.getNextEntry() != null){
+            return collisionGetByLinkedList(key, pos.getNextEntry());
         }
         return null;
         //if(entry.getNextEntry())
