@@ -22,7 +22,8 @@ public class Main {
         for(int m = 13;m<100;m++){
             table.put(Integer.toString(m),"apsodkqw");
         }
-        System.out.println(table.get("74"));
+        table.remove("55");
+        System.out.println(table.get("55"));
 
     }
 }

@@ -1,18 +1,9 @@
 package Structures;
 
-
-//
-//ChatGPT version
-//not anymore :)
-
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class HashTable<K, V> {
     private int size = 5;
     private int quantity =0;
-    private Double LOADFACTOR;
+    private final Double LOADFACTOR;
     private Entry<K, V>[] table;
 
     public HashTable(Double LOADFACTOR) {
@@ -29,39 +20,39 @@ public class HashTable<K, V> {
             quantity++;
             reallocateIfLoadFactor();
         } else {
-            //collisionPutByLinkedList(table[index],entry);
-            quadraticPut(entry,index);
+            collisionPutByLinkedList(table[index],entry);
+            //quadraticPut(entry,index);
         }
     }
 
     public V get(K key) {
         int index = getIndex(key);
 
-//        Entry<K, V> entry = collisionGetByLinkedList(key,table[index]);
-//        if(entry!=null) return entry.getValue();
-//        return null;
+        Entry<K, V> entry = collisionGetByLinkedList(key,table[index]);
+        if(entry!=null) return entry.getValue();
+        return null;
 
         //existe a chance de ser null ! tratar.
-        return quadraticGet(key, index);
+        //return quadraticGet(key, index);
     }
 
     public void remove(K key) {
         int index = getIndex(key);
-        Entry<K, V> entry = table[index];
+        Entry<K, V> current = table[index];
+        Entry<K, V> prev = null;
 
-        if (entry != null && entry.getKey().equals(key)) {
-            table[index] = null;
-            quantity--;
-        }
-
-        int newIndex = (index + 1) % size;
-        while (newIndex != index) {
-            entry = table[newIndex];
-            if (entry != null && entry.getKey().equals(key)) {
-               table[newIndex] = null;
-               return;
+        while (current != null) {
+            if (current.key.equals(key)) {
+                if (prev == null) {
+                    table[index] = current.getNextEntry();
+                } else {
+                    prev.setNextEntry(current.getNextEntry());
+                }
+                quantity--;
+                return;
             }
-            newIndex = (newIndex + 1) % size;
+            prev = current;
+            current = current.getNextEntry();
         }
     }
 
@@ -187,6 +178,7 @@ public class HashTable<K, V> {
     }
     private Entry<K,V> collisionGetByLinkedList(K key,Entry pos){
         Entry entry = pos;
+        if(entry==null) return null;
         if(entry.getKey().equals(key)) return entry;
         if(entry.getNextEntry() != null){
             return collisionGetByLinkedList(key,entry.getNextEntry());
