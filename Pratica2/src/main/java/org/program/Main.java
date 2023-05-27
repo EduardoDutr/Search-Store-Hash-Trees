@@ -1,19 +1,25 @@
 package org.program;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import Structures.HashTable;
+
+
 public class Main {
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        HashTable<String,String> table = new HashTable<>(0.75);
+        table.put("1","1");
+        table.put("2","2123");
+        table.put("3","asd123124");
+        table.put("4","1vvxa");
+        table.put("5","2iojqwd");
+        table.put("6","asd1oepm");
+        table.put("7","1cpao");
+        table.put("8","2qpej");
+        table.put("9","asdr1o3k1");
+        table.put("10","1cvxnm");
+        table.put("11","2p1oj4");
+        table.put("12","asdvpmaeomrf");
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        System.out.println(table.get("4"));
 
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
-        }
     }
 }

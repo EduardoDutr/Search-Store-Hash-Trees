@@ -6,12 +6,17 @@ package Structures;
 //
 
 
+import java.awt.image.Kernel;
+
 public class HashTable<K, V> {
-    private final int SIZE = 10;
+    private int size = 100;
+    private int quantity =0;
+    private Double LOADFACTOR;
     private Entry<K, V>[] table;
 
-    public HashTable() {
-        table = new Entry[SIZE];
+    public HashTable(Double LOADFACTOR) {
+        table = new Entry[size];
+        this.LOADFACTOR = LOADFACTOR;
     }
 
     public void put(K key, V value) {
@@ -20,40 +25,39 @@ public class HashTable<K, V> {
 
         if (table[index] == null) {
             table[index] = entry;
+            quantity++;
+            reallocateIfLoadFactor();
         } else {
-            // Tratamento de colisões, por exemplo, sondagem linear
-            int newIndex = (index + 1) % SIZE;
-            while (newIndex != index && table[newIndex] != null) {
-                newIndex = (newIndex + 1) % SIZE;
+            int count =0;
+            do{
+                count++;
+                index = quadraticProbing(index,count);
             }
-
-            if (newIndex == index) {
-                throw new IllegalStateException("A hashtable está cheia.");
-            } else {
-                table[newIndex] = entry;
+            while(table[index] != null);
+            if (count>=size){
+                //nao tem na tabela
             }
+            table[index] = entry;
+            quantity++;
+            reallocateIfLoadFactor();
         }
     }
 
     public V get(K key) {
         int index = getIndex(key);
-        Entry<K, V> entry = table[index];
+        int count = 0;
 
-        if (entry != null && entry.getKey().equals(key)) {
-            return entry.getValue();
-        }
-
-        // Tratamento de colisões, por exemplo, sondagem linear
-        int newIndex = (index + 1) % SIZE;
-        while (newIndex != index) {
-            entry = table[newIndex];
-            if (entry != null && entry.getKey().equals(key)) {
-                return entry.getValue();
+        while (table[index] != null && count < size) {
+            if (table[index].getKey().equals(key)) {
+                return table[index].getValue();
             }
-            newIndex = (newIndex + 1) % SIZE;
+
+            count++;
+            index = quadraticProbing(index, count);
         }
 
-        return null; // A chave não existe na hashtable
+
+        return null;
     }
 
     public void remove(K key) {
@@ -62,24 +66,33 @@ public class HashTable<K, V> {
 
         if (entry != null && entry.getKey().equals(key)) {
             table[index] = null;
+            quantity--;
         }
 
-        // Tratamento de colisões, por exemplo, sondagem linear
-        int newIndex = (index + 1) % SIZE;
-//        while (newIndex != index) {
-//            entry = table[newIndex];
-//            if (entry != null && entry.getKey().equals(key)) {
-//                table[newIndex] = null;
-//                return;
-//            }
-//            newIndex = (newIndex + 1) % SIZE;
-//        }
+        int newIndex = (index + 1) % size;
+        while (newIndex != index) {
+            entry = table[newIndex];
+            if (entry != null && entry.getKey().equals(key)) {
+               table[newIndex] = null;
+               return;
+            }
+            newIndex = (newIndex + 1) % size;
+        }
     }
 
     private int getIndex(K key) {
-        // Lógica para calcular o índice com base na chave
-        // Você pode usar uma função de hash para isso
-        return key.hashCode() % SIZE;
+        int hash = 0;
+
+        if (key != null) {
+            String strKey = key.toString();
+            int prime = 31;
+
+            for (int i = 0; i < strKey.length(); i++) {
+                hash = (prime * hash + strKey.charAt(i)) % size;
+            }
+        }
+
+        return hash;
     }
 
     private static class Entry<K, V> {
@@ -98,5 +111,23 @@ public class HashTable<K, V> {
         public V getValue() {
             return value;
         }
+    }
+
+
+
+    private void reallocateIfLoadFactor(){
+        if(quantity/size >= LOADFACTOR){
+            Entry<K,V>[] newTable = new Entry[size*2];
+            for(int i =0;i<size;i++){
+                if(table[i] != null){
+                    newTable[i] = table[i];
+                }
+            }
+            table = newTable;
+            size = size*2;
+        }
+    }
+    private int quadraticProbing(int index, int attempt){
+        return (index + attempt *attempt)%size;
     }
 }
