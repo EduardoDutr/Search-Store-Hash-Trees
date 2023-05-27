@@ -3,13 +3,11 @@ package Structures;
 
 //
 //ChatGPT version
-//
+//not anymore :)
 
-
-import java.awt.image.Kernel;
 
 public class HashTable<K, V> {
-    private int size = 100;
+    private int size = 10;
     private int quantity =0;
     private Double LOADFACTOR;
     private Entry<K, V>[] table;
@@ -28,36 +26,20 @@ public class HashTable<K, V> {
             quantity++;
             reallocateIfLoadFactor();
         } else {
-            int count =0;
-            do{
-                count++;
-                index = quadraticProbing(index,count);
-            }
-            while(table[index] != null);
-            if (count>=size){
-                //nao tem na tabela
-            }
-            table[index] = entry;
-            quantity++;
-            reallocateIfLoadFactor();
+            collisionPutByLinkedList(table[index],entry);
+            //quadraticPut(entry,index);
         }
     }
 
     public V get(K key) {
         int index = getIndex(key);
-        int count = 0;
 
-        while (table[index] != null && count < size) {
-            if (table[index].getKey().equals(key)) {
-                return table[index].getValue();
-            }
-
-            count++;
-            index = quadraticProbing(index, count);
-        }
-
-
+        Entry<K, V> entry = collisionGetByLinkedList(key,table[index]);
+        if(entry!=null) return entry.getValue();
         return null;
+
+        //existe a chance de ser null ! tratar.
+        //return quadraticGet(key, index);
     }
 
     public void remove(K key) {
@@ -98,10 +80,12 @@ public class HashTable<K, V> {
     private static class Entry<K, V> {
         private K key;
         private V value;
+        private Entry<K,V> nextEntry;
 
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
+            nextEntry = null;
         }
 
         public K getKey() {
@@ -111,23 +95,95 @@ public class HashTable<K, V> {
         public V getValue() {
             return value;
         }
+
+        public Entry<K, V> getNextEntry() {
+            return nextEntry;
+        }
+
+        public void setNextEntry(Entry<K, V> nextEntry) {
+            this.nextEntry = nextEntry;
+        }
     }
 
 
-
+//erro, adaptar para os metodos quadratico e linked list
     private void reallocateIfLoadFactor(){
-        if(quantity/size >= LOADFACTOR){
-            Entry<K,V>[] newTable = new Entry[size*2];
-            for(int i =0;i<size;i++){
-                if(table[i] != null){
-                    newTable[i] = table[i];
+        if((double)quantity/size >= LOADFACTOR){
+            size = size*2;
+            Entry<K,V>[] newTable = new Entry[size];
+            Entry aux;
+            for(int i =0;i<size/2;i++){
+                if(table[i] !=null){
+                    if(newTable[getIndex(table[i].getKey())] != null){
+                      aux = newTable[getIndex(table[i].getKey())];
+                      while(aux.getNextEntry()!= null){
+                          aux = aux.getNextEntry();
+                      }
+                      aux.setNextEntry(table[i]);
+                    }
+                    else{
+                        newTable[getIndex(table[i].getKey())] = table[i];
+                    }
                 }
             }
             table = newTable;
-            size = size*2;
         }
     }
+
+
     private int quadraticProbing(int index, int attempt){
         return (index + attempt *attempt)%size;
+    }
+    private void quadraticPut(Entry entry,int index){
+        int count =0;
+        do{
+            count++;
+            index = quadraticProbing(index,count);
+        }
+        while(table[index] != null);
+        if (count>=size){
+            //nao tem na tabela
+        }
+        table[index] = entry;
+        quantity++;
+        reallocateIfLoadFactor();
+    }
+    private V quadraticGet(K key, int index){
+        int count = 0;
+        while (table[index] != null && count < size) {
+            if (table[index].getKey().equals(key)) {
+                return table[index].getValue();
+            }
+            count++;
+            index = quadraticProbing(index, count);
+        }
+        return null;
+    }
+
+    //trata caso de repeticao de chaves
+    private void collisionPutByLinkedList(Entry pos, Entry entry){
+        Entry entryAux = pos;
+        if(entryAux.getNextEntry()!= null){
+            collisionPutByLinkedList(entryAux.getNextEntry(),entry);
+        }
+        entryAux.setNextEntry(entry);
+//        while(!pos.getNextEntry().equals(null)){
+//            pos = pos.getNextEntry();
+//        }
+//        pos.setNextEntry(entry);
+    }
+    private Entry<K,V> collisionGetByLinkedList(K key,Entry pos){
+        Entry entry = pos;
+        if(entry.getKey().equals(key)) return entry;
+        if(entry.getNextEntry() != null){
+            return collisionGetByLinkedList(key,entry.getNextEntry());
+        }
+        return null;
+        //if(entry.getNextEntry())
+//        while(entry != null){
+//            if(entry.getKey().equals(key)) break;
+//            entry = pos.getNextEntry();
+//        }
+//        return entry;
     }
 }
