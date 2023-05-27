@@ -3,14 +3,14 @@ package org.Structures;
 public class AVLTree<T extends Comparable<T>> {
     Node<T> root;
 
-    int height(Node node) {
+    int height(Node<T> node) {
         if (node == null)
             return 0;
         return node.getHeight();
     }
 
     int max(int a, int b) {
-        return (a > b) ? a : b;
+        return Math.max(a, b);
     }
 
     Node<T> rightRotate(Node<T> y) {
