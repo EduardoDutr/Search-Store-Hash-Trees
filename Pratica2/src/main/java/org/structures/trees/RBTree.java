@@ -1,17 +1,18 @@
-package org.Structures.trees;
+package org.structures.trees;
 
-import org.Structures.trees.enums.Color;
+import org.structures.trees.enums.Color;
+import org.structures.trees.nodes.RBNode;
 
-public class RBTree<T extends Comparable<T>> implements Tree<T> {
+public class RBTree<T extends Comparable<T>> extends Tree<T> {
 
     private RBNode<T> root;
 
+
     @Override
-    public Tree<T> insert(T data) {
+    public void insert(T data) {
         RBNode<T> node = new RBNode<>(data);
         root = insert(root, node);
         recolorAndRotate(node);
-        return this;
     }
 
     @Override
@@ -157,5 +158,10 @@ public class RBTree<T extends Comparable<T>> implements Tree<T> {
     @Override
     public boolean isEmpty() {
         return root == null;
+    }
+
+    @Override
+    public void printAll() {
+        preOrder(root);
     }
 }

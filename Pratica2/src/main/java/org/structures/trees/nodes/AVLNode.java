@@ -1,4 +1,4 @@
-package org.Structures.trees;
+package org.structures.trees.nodes;
 
 public class AVLNode<T extends Comparable<T>> extends GenericNode<T> {
     private AVLNode<T> leftChild, rightChild;

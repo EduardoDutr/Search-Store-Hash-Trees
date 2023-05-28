@@ -1,4 +1,4 @@
-package org.Structures.trees;
+package org.structures.trees.nodes;
 
 public class BSNode<T extends Comparable<T>> extends GenericNode<T> {
 
@@ -7,14 +7,17 @@ public class BSNode<T extends Comparable<T>> extends GenericNode<T> {
         super(data);
     }
 
+    @Override
     public BSNode<T> getLeftChild() {
         return leftChild;
     }
+
 
     public void setLeftChild(BSNode<T> leftChild) {
         this.leftChild = leftChild;
     }
 
+    @Override
     public BSNode<T> getRightChild() {
         return rightChild;
     }

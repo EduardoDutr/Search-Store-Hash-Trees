@@ -1,12 +1,13 @@
-package org.Structures.trees;
+package org.structures.trees;
 
-public class BSTree<T extends Comparable<T>> implements Tree<T> {
+import org.structures.trees.nodes.BSNode;
+
+public class BSTree<T extends Comparable<T>> extends Tree<T> {
     private BSNode<T> root;
 
     @Override
-    public Tree<T> insert(T data) {
+    public void insert(T data) {
         root = insert(data, root);
-        return this;
     }
 
     private BSNode<T> insert(T data, BSNode<T> node) {
@@ -95,5 +96,10 @@ public class BSTree<T extends Comparable<T>> implements Tree<T> {
     @Override
     public boolean isEmpty() {
         return root == null;
+    }
+
+    @Override
+    public void printAll() {
+        preOrder(root);
     }
 }

@@ -1,13 +1,14 @@
-package org.Structures.trees;
+package org.structures.trees;
 
-public class AVLTree<T extends Comparable<T>> implements Tree<T> {
+import org.structures.trees.nodes.AVLNode;
+
+public class AVLTree<T extends Comparable<T>> extends Tree<T> {
 
     private AVLNode<T> root;
 
     @Override
-    public Tree<T> insert(T data) {
+    public void insert(T data) {
         root = insert(data, root);
-        return this;
     }
 
     private AVLNode<T> insert(T data, AVLNode<T> node) {
@@ -101,6 +102,11 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
         return root == null;
     }
 
+    @Override
+    public void printAll() {
+        preOrder(root);
+    }
+
     private AVLNode<T> applyRotation(AVLNode<T> node) {
         int balance = balance(node);
         if (balance > 1) {
@@ -153,4 +159,5 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
     private int height(AVLNode<T> node) {
         return node != null ? node.getHeight() : 0;
     }
+
 }

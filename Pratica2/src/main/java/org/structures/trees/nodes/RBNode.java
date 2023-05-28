@@ -1,5 +1,5 @@
-package org.Structures.trees;
-import org.Structures.trees.enums.Color;
+package org.structures.trees.nodes;
+import org.structures.trees.enums.Color;
 
 public class RBNode<T> extends GenericNode<T> {
 
