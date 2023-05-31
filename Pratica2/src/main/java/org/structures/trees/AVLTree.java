@@ -107,6 +107,11 @@ public class AVLTree<T extends Comparable<T>> extends Tree<T> {
         preOrder(root);
     }
 
+    @Override
+    public int size() {
+        return size(root);
+    }
+
     private AVLNode<T> applyRotation(AVLNode<T> node) {
         int balance = balance(node);
         if (balance > 1) {

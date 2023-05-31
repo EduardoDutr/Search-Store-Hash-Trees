@@ -164,4 +164,9 @@ public class RBTree<T extends Comparable<T>> extends Tree<T> {
     public void printAll() {
         preOrder(root);
     }
+
+    @Override
+    public int size() {
+        return size(root);
+    }
 }

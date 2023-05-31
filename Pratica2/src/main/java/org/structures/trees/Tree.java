@@ -17,10 +17,21 @@ public abstract class Tree<T extends Comparable<T>> {
 
     public abstract void printAll();
 
+    public abstract int size();
+    protected int size(GenericNode<T> node){
+        int count = 0;
+        if (node != null) {
+            count++;
+            count += size(node.getLeftChild());;
+            count += size(node.getRightChild());
+        }
+        return count;
+    }
+
     protected void preOrder(GenericNode<T> node){
         if (node != null) {
             preOrder(node.getLeftChild());
-            System.out.print(node.getData() + " ");
+            System.out.println(node.getData());
             preOrder(node.getRightChild());
         }
     }

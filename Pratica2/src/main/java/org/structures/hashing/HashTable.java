@@ -1,9 +1,7 @@
 package org.structures.hashing;
 
-
-//
-//ChatGPT version
-//not anymore :)
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class HashTable<K, V> {
@@ -191,5 +189,14 @@ public class HashTable<K, V> {
 //            entry = pos.getNextEntry();
 //        }
 //        return entry;
+    }
+    public List<V> values(){
+        List<V> list = new ArrayList<>();
+        for(int i = 0; i < size; i++){
+            if(table[i] != null){
+                list.add(table[i].value);
+            }
+        }
+        return list;
     }
 }
